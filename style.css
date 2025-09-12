@@ -59,9 +59,7 @@ header nav a:hover {
 .hero {
     text-align: center;
     padding: 40px 20px;
-    background: #ffe8e8;
-    background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url("/Assets/shaurma.jpg") center/cover no-repeat;
-    background-color: #ffe8e8;
+    background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url("Assets/shaurma.jpg") center/cover no-repeat;
 }
 
 .hero h1 {
@@ -148,4 +146,5 @@ footer p {
 .footer__phone {
     color: #ccc;
     text-decoration: none;
+
 }
