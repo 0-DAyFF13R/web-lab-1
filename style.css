@@ -30,7 +30,7 @@ header .container {
 }
   
 header .logo {
-    font-size: 1.5em;
+    font-size: 24px;
     font-weight: bold;
 }
   
@@ -136,7 +136,7 @@ footer {
     color: #ccc;
     text-align: center;
     padding: 20px;
-    font-size: 0.9em;
+    font-size: 14px;
 }
 
 footer p {
@@ -148,3 +148,4 @@ footer p {
     text-decoration: none;
 
 }
+
