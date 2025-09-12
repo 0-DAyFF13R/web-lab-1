@@ -1,0 +1,151 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    background: #fdfdfd;
+    color: #333;
+}
+
+.container {
+    max-width: 1600px;
+    margin: 0 auto;      
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+
+
+/* Header */
+
+header {
+    background: #d63333;
+    color: white;
+    font-family: "Roboto Flex", sans-serif;
+}
+  
+header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+}
+  
+header .logo {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+  
+header nav ul {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+    margin: 0;
+    padding: 0;
+}
+  
+header nav a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+  
+header nav a:hover {
+    text-decoration: underline;
+}
+  
+
+
+/* Banner */
+
+.hero {
+    text-align: center;
+    padding: 40px 20px;
+    background: #ffe8e8;
+    background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url("/Assets/shaurma.jpg") center/cover no-repeat;
+    background-color: #ffe8e8;
+}
+
+.hero h1 {
+    font-size: 40px;
+    color: white;
+    font-family: "Rubik Burned", system-ui;
+    font-weight: 800;
+    font-style: normal;
+}
+
+.hero p {
+    font-size: 22px;
+    color: white;
+    font-family: "Rubik Burned", system-ui;
+    font-weight: 800;
+    font-style: normal;
+}
+
+
+
+/* Menu */
+
+section {
+    padding: 40px 20px;
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #d63333;
+}
+
+table {
+    width: 80%;
+    margin: 0 auto;
+    border-collapse: collapse;
+    background: white;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+table th,
+table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: center;
+}
+
+table th {
+    background: #d63333;
+    color: white;
+}
+
+
+
+/* About */
+
+.about_block {
+    display: flex;
+}
+
+.about_block img {
+    max-width: 600px;
+    border-radius: 15px;
+    margin-left: 15px;
+}
+
+
+
+/* Footer */
+
+footer {
+    background: #333;
+    font-family: "Roboto Flex", sans-serif;
+    color: #ccc;
+    text-align: center;
+    padding: 20px;
+    font-size: 0.9em;
+}
+
+footer p {
+    margin: 5px 0;
+}
+
+.footer__phone {
+    color: #ccc;
+    text-decoration: none;
+}
