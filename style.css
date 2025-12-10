@@ -252,7 +252,7 @@ body.lunch-bg {
     border: 2px solid var(--border-dark);
     border-radius: 12px;
     overflow: hidden;
-    cursor: pointer;
+    cursor: default;
     transition: all 0.3s ease;
     height: 100%;
 }
@@ -631,37 +631,95 @@ input[type="checkbox"] {
 /* ---------- Модальные окна ---------- */
 .modal-overlay {
     position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.5);
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 10000;
+    z-index: 9999;
+    backdrop-filter: blur(2px);
 }
 
 .modal {
+    display: block;
     background: white;
-    border-radius: 15px;
-    padding: 30px;
+    padding: 2rem;
+    border-radius: 12px;
     max-width: 500px;
     width: 90%;
-    box-shadow: var(--shadow-lg);
     text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
 }
 
-.modal .ok {
+.custom-modal {
+    display: block;
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.custom-modal .btn-ok {
+    display: inline-block;
+    background-color: var(--brand-primary);
+    color: #fff;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    padding: 0.7rem 2rem;
+    font-size: 1.1rem;
+    cursor: pointer;
+
+    transition: background-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
+
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.custom-modal .btn-ok:hover {
+    background-color: #b30000;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+}
+
+.custom-modal .btn-ok:active {
+    background-color: #990000;
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.custom-modal .btn-ok:focus {
+    outline: none;
+    box-shadow: 0 0 0 0.25rem rgba(214, 51, 51, 0.4);
+}
+
+.modal p {
+    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+    line-height: 1.5;
+    color: #333;
+}
+
+.modal .btn-ok {
     background: var(--brand-primary);
     color: white;
     border: none;
-    padding: 12px 30px;
-    border-radius: 8px;
-    font-weight: 700;
+    padding: 0.7rem 2rem;
+    border-radius: 6px;
     cursor: pointer;
-    margin-top: 20px;
-    transition: all 0.3s ease;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: background 0.2s;
 }
 
-.modal .ok:hover {
+.modal .btn-ok:hover {
     background: #b30000;
 }
 
