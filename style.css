@@ -445,10 +445,13 @@ body.lunch-bg {
 
 /* Блок с итогом заказа */
 #summary {
-background: #f8f9fa;
-border-radius: 12px;
-padding: 20px;
-border: 2px solid var(--brand-accent-2);
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 20px;
+    border: 2px solid var(--brand-accent-2);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 .summary-block {
@@ -481,7 +484,7 @@ border: 2px solid var(--brand-accent-2);
     font-size: 1.3rem;
     font-weight: 700;
     color: var(--brand-primary);
-    margin-top: 20px;
+    margin-top: auto;
     padding-top: 20px;
     border-top: 2px solid var(--brand-accent-2);
 }
@@ -511,12 +514,25 @@ border: 2px solid var(--brand-accent-2);
     border-radius: 8px;
     font-size: 1rem;
     margin-top: 5px;
+    height: 48px;
+    box-sizing: border-box;
+}
+
+.checkout-grid input[type="radio"],
+.checkout-grid input[type="checkbox"] {
+    height: auto;
 }
 
 .checkout-grid input:focus,
 .checkout-grid select:focus {
     outline: none;
     border-color: var(--brand-primary);
+}
+
+input[type="time"] {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
 }
 
 /* Радио кнопки */
@@ -537,6 +553,42 @@ border: 2px solid var(--brand-accent-2);
     align-items: center;
     margin-bottom: 10px;
     cursor: pointer;
+}
+
+.form-check-input {
+    width: 20px !important;
+    height: 20px !important;
+    margin-top: 0 !important;
+    margin-right: 8px !important;
+}
+
+.form-check-label {
+    margin-left: 5px;
+}
+
+.form-check-input[type="radio"] {
+    border-radius: 50% !important;
+}
+
+/* Для чекбокса тоже */
+.form-check-input[type="checkbox"] {
+    border-radius: 4px !important;
+    width: 20px !important;
+    height: 20px !important;
+}
+
+input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+    vertical-align: middle;
 }
 
 .checkout-grid fieldset input[type="radio"] {
