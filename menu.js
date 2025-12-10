@@ -257,13 +257,13 @@
             if (dish.image) {
                 if (dish.image.startsWith('http') || dish.image.startsWith('data:')) {
                     imageUrl = dish.image;
-                } else if (dish.image.includes('.')) {
-                    imageUrl = `Assets/${dish.image}`;
                 } else {
-                    imageUrl = `Assets/${dish.image}.jpg`;
+                    // Добавляем .jpg если нет расширения
+                    const fileName = dish.image.includes('.') ? dish.image : `${dish.image}.jpg`;
+                    imageUrl = `https://raw.githubusercontent.com/0-DAyFF13R/web-lab-1/main/Assets/${fileName}`;
                 }
             } else {
-                imageUrl = 'Assets/placeholder.png';
+                imageUrl = 'https://raw.githubusercontent.com/0-DAyFF13R/web-lab-1/main/Assets/placeholder.jpg';
             }
 
             html += `
@@ -274,7 +274,7 @@
             <img src="${imageUrl}"
             alt="${dish.name}"
             class="plate-img"
-            onerror="this.src='Assets/placeholder.png'">
+            onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/0-DAyFF13R/web-lab-1/main/Assets/placeholder.jpg'">
             <div class="plate-info">
             <p class="plate-title">${dish.name}</p>
             <p class="plate-desc">${dish.desc || ''}</p>
