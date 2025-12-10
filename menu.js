@@ -603,27 +603,31 @@
         const overlay = document.createElement('div');
         overlay.className = 'modal-overlay';
         overlay.innerHTML = `
-        <div class="modal">
-        <p>${message}</p>
-        <button class="ok" type="button">ОК</button>
-        </div>
-        `;
+        <div class="custom-modal">
+        <p>${message.replace(/\n/g, '<br>')}</p>
+        <button class="btn-ok" type="button">ОК</button>
+        </div>`;
 
         document.body.appendChild(overlay);
 
-        const closeModal = () => overlay.remove();
+        const closeModal = () => {
+            overlay.remove();
+            document.removeEventListener('keydown', escHandler);
+        };
 
-        overlay.querySelector('.ok').addEventListener('click', closeModal);
+        const escHandler = (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        };
+
+        overlay.querySelector('.btn-ok').addEventListener('click', closeModal);
+
         overlay.addEventListener('click', (e) => {
             if (e.target === overlay) closeModal();
         });
 
-            document.addEventListener('keydown', function escHandler(e) {
-                if (e.key === 'Escape') {
-                    closeModal();
-                    document.removeEventListener('keydown', escHandler);
-                }
-            });
+            document.addEventListener('keydown', escHandler);
     }
 
     // ---- 12) ИНИЦИАЛИЗАЦИЯ =====
