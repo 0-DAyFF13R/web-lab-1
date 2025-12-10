@@ -118,55 +118,63 @@
 
         <!-- Правая колонка - Данные для доставки -->
         <fieldset class="card">
-          <h4>Данные для доставки</h4>
+            <h4 class="mb-4">Данные для доставки</h4>
 
-          <label>
-            Ваше имя
-            <input type="text" name="name" required placeholder="Иван Иванов">
-          </label>
+            <div class="mb-3">
+                <label class="form-label">Ваше имя</label>
+                <input type="text" name="name" class="form-control" required placeholder="Иван Иванов">
+            </div>
 
-          <label>
-            Номер телефона
-            <input type="tel" name="phone" required placeholder="+7 999 123-45-67" pattern="^\+?7\s?\d{3}\s?\d{3}-?\d{2}-?\d{2}$">
-          </label>
+            <div class="mb-3">
+                <label class="form-label">Номер телефона</label>
+                <input type="tel" name="phone" class="form-control" required placeholder="+7 999 123-45-67" pattern="^\+?7\s?\d{3}\s?\d{3}-?\d{2}-?\d{2}$">
+            </div>
 
-          <label>
-            Адрес доставки
-            <input type="text" name="address" required placeholder="Улица, дом, квартира">
-          </label>
+            <div class="mb-3">
+                <label class="form-label">Адрес доставки</label>
+                <input type="text" name="address" class="form-control" required placeholder="Улица, дом, квартира">
+            </div>
 
-          <label>
-            Email (для уведомлений)
-            <input type="email" name="email" placeholder="email@example.com">
-          </label>
+            <div class="mb-3">
+                <label class="form-label">Email (для уведомлений)</label>
+                <input type="email" name="email" class="form-control" placeholder="email@example.com">
+            </div>
 
-          <fieldset>
-            <legend>Время доставки:</legend>
-            <label><input type="radio" name="delivery_time" value="asap" checked> Как можно скорее</label>
-            <label><input type="radio" name="delivery_time" value="scheduled"> Ко времени</label>
-          </fieldset>
+            <div class="mb-3">
+                <legend class="form-label">Время доставки:</legend>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="delivery_time" value="asap" id="asap" checked>
+                    <label class="form-check-label" for="asap">Как можно скорее</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="delivery_time" value="scheduled" id="scheduled">
+                    <label class="form-check-label" for="scheduled">Ко времени</label>
+                </div>
+            </div>
 
-          <label>
-            Укажите время доставки
-            <input type="time" name="specific_time" min="10:00" max="23:00" disabled>
-          </label>
+            <div class="mb-3">
+                <label class="form-label">Укажите время доставки</label>
+                <input type="time" name="specific_time" class="form-control" min="10:00" max="23:00" disabled>
+            </div>
 
-          <label class="remember">
-            <input type="checkbox" name="subscribe" value="yes">
-            Получать информацию о скидках и акциях
-          </label>
+            <div class="form-check mb-4">
+                <input class="form-check-input" type="checkbox" name="subscribe" value="yes" id="subscribe">
+                <label class="form-check-label" for="subscribe">
+                    Получать информацию о скидках и акциях
+                </label>
+            </div>
 
-          <div class="mt-4">
-            <button type="reset" class="btn btn-secondary">Очистить заказ</button>
-            <button type="submit" class="btn btn-primary">Оформить заказ</button>
-          </div>
+            <div class="mt-4">
+                <button type="reset" class="btn btn-secondary w-100 mb-2">Очистить заказ</button>
+                <button type="submit" class="btn btn-primary w-100">Оформить заказ</button>
+            </div>
 
-          <!-- Скрытые поля для выбранных блюд -->
-          <input type="hidden" name="hot_items" id="hidden-hot">
-          <input type="hidden" name="snack_items" id="hidden-snack">
-          <input type="hidden" name="dessert_items" id="hidden-dessert">
-          <input type="hidden" name="drink_items" id="hidden-drink">
-          <input type="hidden" name="combo_items" id="hidden-combo">
+            <!-- Скрытые поля для выбранных блюд -->
+            <input type="hidden" name="hot_items" id="hidden-hot">
+            <input type="hidden" name="snack_items" id="hidden-snack">
+            <input type="hidden" name="dessert_items" id="hidden-dessert">
+            <input type="hidden" name="drink_items" id="hidden-drink">
+            <input type="hidden" name="combo_items" id="hidden-combo">
         </fieldset>
       </form>
     </section>
