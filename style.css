@@ -560,6 +560,8 @@ input[type="time"] {
     height: 20px !important;
     margin-top: 0 !important;
     margin-right: 8px !important;
+
+    transform: translateY(4px);
 }
 
 .form-check-label {
