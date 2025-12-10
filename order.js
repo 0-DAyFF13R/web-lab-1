@@ -1,4 +1,4 @@
-const API_ORDERS = 'https://690a91d51a446bb9cc22ec28.mockapi.io/api/v1/orders';
+const API_ORDERS = 'https://6939a0a0c8d59937aa088b2d.mockapi.io/api/v1/orders';
 
 document.addEventListener('DOMContentLoaded', loadOrders);
 
