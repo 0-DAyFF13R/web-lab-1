@@ -127,97 +127,293 @@ async function deleteOrder(orderId) {
 
 async function editOrder(orderId) {
     try {
-        const response = await fetch(`${API_ORDERS}/${orderId}`);
-        if (!response.ok) throw new Error('Ошибка загрузки заказа');
+        console.log('Запрос заказа:', orderId);
+        const url = `${API_ORDERS}/${orderId}`;
+        const response = await fetch(url);
 
-        const order = await response.json();
+        // Логируем статус и заголовки (поможет в отладке CORS/ошибок)
+        console.log('Ответ сервера:', response.status, response.statusText);
+        console.log('Response headers:', Array.from(response.headers.entries()));
+
+        if (!response.ok) {
+            // Попытка прочитать тело ответа для более подробной ошибки
+            let bodyText = '';
+            try {
+                bodyText = await response.text();
+            } catch (e) {
+                bodyText = '<не удалось прочитать тело ответа>';
+            }
+            console.error('Ошибка при загрузке заказа:', response.status, bodyText);
+            throw new Error(`HTTP ${response.status} ${response.statusText} — ${bodyText}`);
+        }
+
+        // Пытаемся распарсить JSON (ловим ошибки парсинга отдельно)
+        let order;
+        try {
+            order = await response.json();
+        } catch (e) {
+            console.error('Ошибка парсинга JSON для заказа', orderId, e);
+            throw new Error('Получен ответ не в формате JSON');
+        }
+
+        // Дополнительно логируем полученный объект
+        console.log('Данные заказа загружены:', order);
+
         showEditModal(order);
 
     } catch (error) {
         console.error('Ошибка загрузки заказа для редактирования:', error);
-        alert('Не удалось загрузить данные заказа.');
+        // Показываем пользователю более подробное сообщение (без утечки внутреннего стека)
+        alert('Не удалось загрузить данные заказа. ' + (error.message || 'Смотрите консоль для деталей.'));
     }
 }
 
+
 function showEditModal(order) {
+    // Один модал — уникальные id с префиксом по order.id
+    const id = order.id;
+    const prefix = `order-${id}`;
+
+    // Удобная функция для безопасного отображения пустых значений
+    const safe = (v) => (v === undefined || v === null) ? '' : v;
+
+    // Рендерим таблицу позиций (кол-во редактируемое, есть чекбокс для удаления)
+    const items = (order.items || []).map((item, idx) => {
+        return `
+        <tr data-idx="${idx}">
+            <td>${item.name}</td>
+            <td>${item.price} ₽</td>
+            <td>
+                <input type="number" min="0" step="1" class="form-control edit-item-qty"
+                    id="${prefix}-qty-${idx}" value="${item.quantity}" style="width:90px;">
+            </td>
+            <td>
+                <input type="checkbox" class="form-check-input edit-item-remove" id="${prefix}-remove-${idx}">
+                <label class="form-check-label" for="${prefix}-remove-${idx}">Удалить</label>
+            </td>
+        </tr>
+        `;
+    }).join('') || `<tr><td colspan="4">Нет информации о составе</td></tr>`;
+
     const modal = document.createElement('div');
     modal.className = 'modal-overlay';
     modal.innerHTML = `
     <div class="modal">
-    <h3>Редактирование заказа #${order.id}</h3>
+      <h3>Редактирование заказа #${safe(order.id)}</h3>
 
-    <div class="edit-form">
-    <label>
-    Статус заказа:
-    <select id="edit-status" class="form-select">
-    <option value="новый" ${order.status === 'новый' ? 'selected' : ''}>Новый</option>
-    <option value="готовится" ${order.status === 'готовится' ? 'selected' : ''}>Готовится</option>
-    <option value="в пути" ${order.status === 'в пути' ? 'selected' : ''}>В пути</option>
-    <option value="доставлен" ${order.status === 'доставлен' ? 'selected' : ''}>Доставлен</option>
-    <option value="отменен" ${order.status === 'отменен' ? 'selected' : ''}>Отменен</option>
-    </select>
-    </label>
+      <div class="edit-form">
+        <div class="row">
+          <div class="col-md-6 mb-2">
+            <label class="form-label">Имя</label>
+            <input id="${prefix}-name" type="text" class="form-control" value="${escapeHtml(safe(order.customer_name))}">
+          </div>
+          <div class="col-md-6 mb-2">
+            <label class="form-label">Телефон</label>
+            <input id="${prefix}-phone" type="tel" class="form-control" value="${escapeHtml(safe(order.phone))}">
+          </div>
+        </div>
 
-    <label>
-    Комментарий:
-    <textarea id="edit-comment" class="form-control" rows="3">${order.comment || ''}</textarea>
-    </label>
+        <div class="mb-2">
+            <label class="form-label">Email</label>
+            <input id="${prefix}-email" type="email" class="form-control" value="${escapeHtml(safe(order.email))}">
+        </div>
 
-    <div class="modal-actions mt-4">
-    <button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">
-    Отмена
-    </button>
-    <button class="btn btn-primary" onclick="saveOrderChanges('${order.id}')">
-    Сохранить
-    </button>
-    </div>
-    </div>
+        <div class="mb-2">
+          <label class="form-label">Адрес</label>
+          <input id="${prefix}-address" type="text" class="form-control" value="${escapeHtml(safe(order.address))}">
+        </div>
+
+        <div class="mb-2">
+          <legend class="form-label">Время доставки</legend>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="${prefix}-delivery_time" id="${prefix}-asap" value="asap" ${order.delivery_time !== 'scheduled' ? 'checked' : ''}>
+            <label class="form-check-label" for="${prefix}-asap">Как можно скорее</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="${prefix}-delivery_time" id="${prefix}-scheduled" value="scheduled" ${order.delivery_time === 'scheduled' ? 'checked' : ''}>
+            <label class="form-check-label" for="${prefix}-scheduled">Ко времени</label>
+          </div>
+        </div>
+
+        <div class="mb-2">
+          <label class="form-label">Указать точное время</label>
+          <input id="${prefix}-specific_time" type="time" class="form-control" min="10:00" max="23:00" value="${safe(order.specific_time || '')}" ${order.delivery_time === 'scheduled' ? '' : 'disabled'}>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Статус</label>
+          <select id="${prefix}-status" class="form-select">
+            <option value="новый" ${order.status === 'новый' ? 'selected' : ''}>Новый</option>
+            <option value="готовится" ${order.status === 'готовится' ? 'selected' : ''}>Готовится</option>
+            <option value="в пути" ${order.status === 'в пути' ? 'selected' : ''}>В пути</option>
+            <option value="доставлен" ${order.status === 'доставлен' ? 'selected' : ''}>Доставлен</option>
+            <option value="отменен" ${order.status === 'отменен' ? 'selected' : ''}>Отменен</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Комментарий</label>
+          <textarea id="${prefix}-comment" class="form-control" rows="2">${escapeHtml(safe(order.comment))}</textarea>
+        </div>
+
+        <div class="modal-actions mt-3 d-flex flex-column gap-2">
+          <button class="btn btn-secondary" type="button" id="${prefix}-cancel">Отмена</button>
+          <button class="btn btn-primary" type="button" id="${prefix}-save">Сохранить</button>
+        </div>
+      </div>
     </div>
     `;
 
     document.body.appendChild(modal);
+
+    // Включаем/отключаем поле specific_time при переключении radio
+    const asapRadio = modal.querySelector(`#${prefix}-asap`);
+    const scheduledRadio = modal.querySelector(`#${prefix}-scheduled`);
+    const specificInput = modal.querySelector(`#${prefix}-specific_time`);
+
+    function updateSpecificState() {
+        if (scheduledRadio.checked) {
+            specificInput.disabled = false;
+            if (!specificInput.value) {
+                // если пусто — ставим текущее +1 час
+                const now = new Date();
+                now.setHours(now.getHours() + 1);
+                specificInput.value = now.toTimeString().slice(0,5);
+            }
+        } else {
+            specificInput.disabled = true;
+        }
+    }
+
+    asapRadio.addEventListener('change', updateSpecificState);
+    scheduledRadio.addEventListener('change', updateSpecificState);
+    updateSpecificState();
+
+    // Отмена
+    modal.querySelector(`#${prefix}-cancel`).addEventListener('click', () => {
+        modal.remove();
+    });
+
+    // Сохранение — вызывает глобальную функцию, передаём id (она в следующем блоке)
+    modal.querySelector(`#${prefix}-save`).addEventListener('click', () => {
+        saveOrderChanges(id);
+    });
+}
+
+function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
 }
 
 async function saveOrderChanges(orderId) {
-    const status = document.getElementById('edit-status').value;
-    const comment = document.getElementById('edit-comment').value;
+    const prefix = `order-${orderId}`;
+    const modalOverlay = document.querySelector('.modal-overlay');
+    if (!modalOverlay) {
+        alert('Модальное окно не найдено.');
+        return;
+    }
+
+    // Берём значения полей
+    const name = document.getElementById(`${prefix}-name`).value.trim();
+    const phone = document.getElementById(`${prefix}-phone`).value.trim();
+    const address = document.getElementById(`${prefix}-address`).value.trim();
+    const email = document.getElementById(`${prefix}-email`).value.trim();
+    const delivery_time = document.querySelector(`input[name="${prefix}-delivery_time"]:checked`).value;
+    const specific_time = document.getElementById(`${prefix}-specific_time`).value;
+    const status = document.getElementById(`${prefix}-status`).value;
+    const comment = document.getElementById(`${prefix}-comment`).value.trim();
+
+    // Простая валидация
+    if (!name || !phone || !address) {
+        alert('Поля имя, телефон и адрес обязательны.');
+        return;
+    }
 
     try {
-        // Сначала получаем текущий заказ
-        const response = await fetch(`${API_ORDERS}/${orderId}`);
-        if (!response.ok) throw new Error('Ошибка загрузки заказа');
+        // Получаем текущие данные заказа (чтобы взять оригинальные items и другие поля)
+        const resp = await fetch(`${API_ORDERS}/${orderId}`);
+        if (!resp.ok) throw new Error('Ошибка загрузки заказа');
 
-        const order = await response.json();
+        const order = await resp.json();
 
-        // Обновляем данные
+        // Обрабатываем редактирование позиций:
+        const itemsTable = document.getElementById(`${prefix}-items-table`);
+        const newItems = [];
+        const rows = itemsTable ? Array.from(itemsTable.querySelectorAll('tr[data-idx]')) : [];
+
+        rows.forEach(row => {
+            const idx = parseInt(row.dataset.idx, 10);
+            const original = (order.items || [])[idx];
+            if (!original) return; // защита
+
+            const qtyInput = document.getElementById(`${prefix}-qty-${idx}`);
+            const remCheckbox = document.getElementById(`${prefix}-remove-${idx}`);
+
+            const remove = remCheckbox && remCheckbox.checked;
+            const qty = qtyInput ? parseInt(qtyInput.value, 10) || 0 : original.quantity;
+
+            if (remove) {
+                // пропускаем — позиция помечена для удаления
+                return;
+            }
+
+            if (qty <= 0) {
+                // если 0 — тоже пропускаем
+                return;
+            }
+
+            // Собираем обновлённую позицию
+            newItems.push({
+                category: original.category,
+                name: original.name,
+                price: original.price,
+                quantity: qty,
+                keyword: original.keyword
+            });
+        });
+
+        // Если пользователь удалил все позиции — можно либо запретить, либо разрешить (зависит от политики).
+        // Здесь мы разрешаем, но дальше в validateOrder это может отфильтроваться.
+        // Пересчитываем сумму
+        const total = newItems.reduce((s, it) => s + (it.price * it.quantity), 0);
+
+        // Формируем обновлённый объект
         const updatedOrder = {
             ...order,
+            customer_name: name,
+            phone: phone,
+            address: address,
+            email: email,
+            delivery_time: delivery_time,
+            specific_time: delivery_time === 'scheduled' ? specific_time : '',
+            items: newItems,
+            total: total,
             status: status,
             comment: comment,
             updated_at: new Date().toISOString()
         };
 
-        // Отправляем изменения
+        // Отправляем PUT
         const updateResponse = await fetch(`${API_ORDERS}/${orderId}`, {
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(updatedOrder)
         });
 
         if (!updateResponse.ok) throw new Error('Ошибка сохранения');
 
-        // Закрываем модальное окно
-        document.querySelector('.modal-overlay').remove();
-
-        // Обновляем список заказов
-        loadOrders();
-
-        alert('Изменения сохранены!');
+        // Закрываем модал и обновляем список
+        modalOverlay.remove();
+        await loadOrders();
+        alert('Изменения сохранены.');
 
     } catch (error) {
         console.error('Ошибка сохранения изменений:', error);
-        alert('Не удалось сохранить изменения. Пожалуйста, попробуйте позже.');
+        alert('Не удалось сохранить изменения. ' + (error.message || ''));
     }
 }
