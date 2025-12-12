@@ -437,7 +437,103 @@
         totalEl.textContent = `${total} ₽`;
     }
 
-    // ---- 9) ОБРАБОТКА ФОРМЫ =====
+    // ===== ВАЛИДАЦИЯ ЗАКАЗА =====
+    const ERROR_MESSAGES = {
+        'no_items': 'Ничего не выбрано. Выберите блюда для заказа',
+        'no_drink': 'Выберите напиток',
+        'no_main_or_snack': 'Выберите главное блюдо или закуску',
+        'no_main': 'Выберите главное блюдо',
+        'no_hot_or_snack': 'Выберите горячее или закуску'
+    };
+
+    // Функция проверки выбранных блюд
+    function validateOrder() {
+        // Проверяем, есть ли вообще какие-то выбранные блюда
+        const hasAnyItems = Object.keys(selected).some(category =>
+        selected[category]?.items?.length > 0
+        );
+
+        if (!hasAnyItems) {
+            return { valid: false, message: ERROR_MESSAGES.no_items };
+        }
+
+        // Определяем, какие категории выбраны
+        const hasHot = selected.hot?.items?.length > 0;
+        const hasSnack = selected.snack?.items?.length > 0;
+        const hasDessert = selected.dessert?.items?.length > 0;
+        const hasDrink = selected.drink?.items?.length > 0;
+        const hasCombo = selected.combo?.items?.length > 0;
+
+        // Логика проверки на основе таблицы уведомлений
+        // 1. Если выбрано комбо и нет напитка
+        if (hasCombo && !hasDrink) {
+            return { valid: false, message: ERROR_MESSAGES.no_drink };
+        }
+
+        // 2. Если есть напиток и (десерт или комбо), но нет горячего или закуски
+        if (hasDrink && (hasDessert || hasCombo) && !hasHot && !hasSnack) {
+            return { valid: false, message: ERROR_MESSAGES.no_main };
+        }
+
+        // 3. Если есть закуска, но нет горячего и напитка
+        if (hasSnack && !hasHot && !hasDrink) {
+            return { valid: false, message: ERROR_MESSAGES.no_hot_or_snack };
+        }
+
+        // 4. Если есть горячее, но нет закуски и напитка
+        if (hasHot && !hasSnack && !hasDrink) {
+            return { valid: false, message: ERROR_MESSAGES.no_drink };
+        }
+
+        // 5. Если нет напитка, но есть горячее или закуска
+        if (!hasDrink && (hasHot || hasSnack)) {
+            return { valid: false, message: ERROR_MESSAGES.no_drink };
+        }
+
+        // 6. Если нет горячего, закуски, комбо, но есть напиток
+        if (!hasHot && !hasSnack && !hasCombo && hasDrink) {
+            return { valid: false, message: ERROR_MESSAGES.no_main_or_snack };
+        }
+
+        // Проверяем возможные комбинации
+        // 1. Горячее + Напиток
+        if (hasHot && hasDrink && !hasSnack && !hasDessert && !hasCombo) {
+            return { valid: true };
+        }
+
+        // 2. Закуска + Напиток
+        if (hasSnack && hasDrink && !hasHot && !hasDessert && !hasCombo) {
+            return { valid: true };
+        }
+
+        // 3. Горячее + Закуска + Напиток
+        if (hasHot && hasSnack && hasDrink && !hasDessert && !hasCombo) {
+            return { valid: true };
+        }
+
+        // 4. Десерт + Напиток
+        if (hasDessert && hasDrink && !hasHot && !hasSnack && !hasCombo) {
+            return { valid: true };
+        }
+
+        // 5. Только комбо
+        if (hasCombo && !hasHot && !hasSnack && !hasDessert && !hasDrink) {
+            return { valid: true };
+        }
+
+        // 6. Комбо + напиток отдельно
+        if (hasCombo && hasDrink && !hasHot && !hasSnack && !hasDessert) {
+            return { valid: true };
+        }
+
+        // Если ничего не подошло
+        return {
+            valid: false,
+            message: 'Выбранные блюда не соответствуют ни одному варианту комбо. Пожалуйста, выберите один из вариантов: горячее + напиток, закуска + напиток, горячее + закуска + напиток, десерт + напиток или комбо-набор.'
+        };
+    }
+
+    // ---- 9) ОБРАБОТКА ФОРМЫ С ВАЛИДАЦИЕЙ =====
     function setupFormHandlers() {
         const form = document.querySelector('form');
         if (!form) return;
@@ -482,17 +578,15 @@
             }, 0);
         });
 
-        // Отправка формы
+        // Отправка формы С ВАЛИДАЦИЕЙ
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            // Проверка наличия товаров
-            const hasItems = Object.keys(selected).some(category =>
-            selected[category].items.length > 0
-            );
+            // ВАЛИДАЦИЯ ЗАКАЗА
+            const validation = validateOrder();
 
-            if (!hasItems) {
-                showModal('Пожалуйста, выберите хотя бы одно блюдо!');
+            if (!validation.valid) {
+                showModal(validation.message);
                 return;
             }
 
@@ -654,7 +748,7 @@
         // Настраиваем фильтры категорий
         setupFilters();
 
-        // Настраиваем обработчики формы
+        // Настраиваем обработчики формы С ВАЛИДАЦИЕЙ
         setupFormHandlers();
 
         console.log('Приложение инициализировано');
